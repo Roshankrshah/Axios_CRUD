@@ -1,4 +1,4 @@
-getTodos = async () =>{
+getTodos = async () => {
     /*axios({
         method : 'Get',
         url: 'https://jsonplaceholder.typicode.com/todos',
@@ -14,38 +14,76 @@ getTodos = async () =>{
       })
     .then(res => showOutput(res))
     .catch(err => console.log(err));*/
-    try{
-    const data = await axios('https://jsonplaceholder.typicode.com/todos?_limit=5');
-    console.log(data);
-    showOutput(data);
-    }catch(err){
+    try {
+        const data = await axios('https://jsonplaceholder.typicode.com/todos?_limit=5');
+        console.log(data);
+        showOutput(data);
+    } catch (err) {
         console.log(err);
     }
 }
 
 // POST REQUEST
 function addTodo() {
-    console.log('POST Request');
+    axios
+        .post('https://jsonplaceholder.typicode.com/todos', {
+            title: 'New Todo',
+            completed: false
+        })
+        .then(data => showOutput(data))
+        .catch(err => console.error(err));
 }
 
 // PUT/PATCH REQUEST
 function updateTodo() {
-    console.log('PUT/PATCH Request');
+    axios
+        .patch('https://jsonplaceholder.typicode.com/todos/1', {
+            title: 'Updated Todo',
+            completed: true
+        })
+        .then(res => showOutput(res))
+        .catch(err => console.error(err));
 }
 
 // DELETE REQUEST
 function removeTodo() {
-    console.log('DELETE Request');
+    axios
+        .delete('https://jsonplaceholder.typicode.com/todos/1')
+        .then(res => showOutput(res))
+        .catch(err => console.error(err));
 }
 
 // SIMULTANEOUS DATA
 function getData() {
-    console.log('Simultaneous Request');
+    axios
+        .all([
+            axios.get('https://jsonplaceholder.typicode.com/todos?_limit=5'),
+            axios.get('https://jsonplaceholder.typicode.com/posts?_limit=5')
+        ])
+        .then(axios.spread((todos, posts) => showOutput(posts)))
+        .catch(err => console.error(err));
 }
 
 // CUSTOM HEADERS
 function customHeaders() {
-    console.log('Custom Headers');
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'sometoken'
+        }
+    };
+
+    axios
+        .post(
+            'https://jsonplaceholder.typicode.com/todos',
+            {
+                title: 'New Todo',
+                completed: false
+            },
+            config
+        )
+        .then(res => showOutput(res))
+        .catch(err => console.error(err));
 }
 
 // TRANSFORMING REQUESTS & RESPONSES
@@ -64,6 +102,20 @@ function cancelToken() {
 }
 
 // INTERCEPTING REQUESTS & RESPONSES
+axios.interceptors.request.use(
+    (config) => {
+        console.log(
+            `${config.method.toUpperCase()} request sent to ${config.url
+            } at ${new Date().getTime()}`
+        );
+
+        return config;
+    },
+    error => {
+        return Promise.reject(error);
+    }
+);
+
 
 // AXIOS INSTANCES
 
